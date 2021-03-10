@@ -1,6 +1,37 @@
 package day3;
 
 public class Answers {
+	
+	/*
+	 * Q1- 5)
+	 * 
+	 * Q2- 1)
+	 * 
+	 * 
+	 * Q3) - 2 and 3
+	 * 
+	 * 
+	 * Q4) - 1)
+	 * 
+	 * 
+	 * Q5) - 4
+	 * 
+	 * 
+	 * Q6) - then is not a reserved keyword
+	 * 
+	 * 
+	 * Q7) - except 2 and 6
+	 * 
+	 * 
+	 * Q8) Answer=0
+	 * 
+	 * 
+	 * Q9) answer = 2
+	 * 
+	 * 
+	 * Q10) 0
+	 * 
+	 */
 //Q11 -  a sequence of 5 0's will be printed (or) Error Mine must be declared abstract 
 /*
  * q12- 	one, two, default (because there is no break )
@@ -15,14 +46,10 @@ public class Answers {
 Doing finally
 -1
 
-Q16-
-
-
-
 q17-Runtime exception
 
 
-Q18-
+Q18-1
 
 
 
