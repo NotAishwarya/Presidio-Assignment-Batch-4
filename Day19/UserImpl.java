@@ -11,13 +11,13 @@ import java.util.List;
 
 public class UserImpl implements UserDAO {
 
-	Connection con;
-	Statement findAllStatement;
-	PreparedStatement findByIDStatement;
-	PreparedStatement insertItemStatement;
-	PreparedStatement deleteStatement;
-	PreparedStatement updateStatement;
-	PreparedStatement createTable;
+	private Connection con;
+	private Statement findAllStatement;
+	private PreparedStatement findByIDStatement;
+	private PreparedStatement insertItemStatement;
+	private PreparedStatement deleteStatement;
+	private PreparedStatement updateStatement;
+	private PreparedStatement createTable;
 
 	public UserImpl(Connection con) {
 		// TODO Auto-generated constructor stub
@@ -27,7 +27,7 @@ public class UserImpl implements UserDAO {
 			createTable = con.prepareStatement("create table users(userid INTEGER, username varchar(30), password varchar(30), flag INTEGER)");
 			findByIDStatement = con.prepareStatement("select * from users where userid = ?");
 			insertItemStatement = con.prepareStatement("insert into users values(?, ?, ?, ?)");
-			deleteStatement = con.prepareStatement("delete from users where customer_id = ?");
+			deleteStatement = con.prepareStatement("delete from users where userid = ?");
 			updateStatement = con
 					.prepareStatement("update users set username = ?, password = ?, flag = ? where userid = ?");
 		} catch (SQLException e) {
@@ -90,22 +90,19 @@ public class UserImpl implements UserDAO {
 	public int insertUser(UserDTO userDTO) {
 		// TODO Auto-generated method stub
 		int userid = userDTO.getUserid();
-		String username = userDTO.getUsername();
-		String password = userDTO.getPassword();
-		int flag = userDTO.getFlag();
 
 		int i = 0;
 		try {
 			findByIDStatement.setInt(1, userid);
 			ResultSet rs = findByIDStatement.executeQuery();
 
-			if (rs != null)
+			if (rs.next())
 				return 0;
 
 			insertItemStatement.setInt(1, userid);
-			insertItemStatement.setString(2, username);
-			insertItemStatement.setString(3, password);
-			insertItemStatement.setInt(4, flag);
+			insertItemStatement.setString(2, userDTO.getUsername());
+			insertItemStatement.setString(3, userDTO.getPassword());
+			insertItemStatement.setInt(4, userDTO.getFlag());
 
 			i = insertItemStatement.executeUpdate();
 		} catch (Exception e) {
@@ -120,20 +117,15 @@ public class UserImpl implements UserDAO {
 	@Override
 	public int updateUser(UserDTO userDTO) {
 		// TODO Auto-generated method stub
-		int userid = userDTO.getUserid();
-		String username = userDTO.getUsername();
-		String password = userDTO.getPassword();
-		int flag = userDTO.getFlag();
-
 		int i = 0;
 
 		try {
-			updateStatement.setInt(4, userid);
-			updateStatement.setString(1, username);
-			updateStatement.setString(2, password);
-			updateStatement.setInt(3, flag);
+			updateStatement.setInt(4, userDTO.getUserid());
+			updateStatement.setString(1, userDTO.getUsername());
+			updateStatement.setString(2, userDTO.getPassword());
+			updateStatement.setInt(3, userDTO.getFlag());
 
-			i = insertItemStatement.executeUpdate();
+			i = updateStatement.executeUpdate();
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
@@ -162,12 +154,10 @@ public class UserImpl implements UserDAO {
 	@Override
 	public int deleteUserByDTO(UserDTO userDTO) {
 		// TODO Auto-generated method stub
-		int userid = userDTO.getUserid();
-
 		int i = 0;
 
 		try {
-			deleteStatement.setInt(1, userid);
+			deleteStatement.setInt(1, userDTO.getUserid());
 			i = deleteStatement.executeUpdate();
 		} catch (Exception e) {
 			// TODO: handle exception

@@ -4,16 +4,16 @@ import java.util.List;
 
 public interface InvoiceMasterDAO {
 	public int createInvoiceMasterTable();
-	
+
 	public InvoiceMasterDTO findByID(Integer invoiceId);
 
 	public List<InvoiceMasterDTO> findAll();
 
-	public int insertItem(InvoiceMasterDTO invoiceMasterDTO);
+	public int insertInvoiceMasterItem(InvoiceMasterDTO invoiceMasterDTO);
 
-	public int updateItem(InvoiceMasterDTO invoiceMasterDTO);
+	public int updateInvoiceMasterItem(InvoiceMasterDTO invoiceMasterDTO);
 
-	public int deleteItemByID(Integer invoiceId);
+	public int deleteInvoiceMasterItemByID(Integer invoiceId);
 
-	public int deleteItemByDTO(InvoiceMasterDTO invoiceMasterDTO);
+	public int deleteInvoiceMasterItemByDTO(InvoiceMasterDTO invoiceMasterDTO);
 }

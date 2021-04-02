@@ -12,19 +12,19 @@ import day18.JDBCUtility;
 
 public class InvoiceMasterImpl implements InvoiceMasterDAO{
 
-	Connection con;
-	Statement findAllStatement;
-	PreparedStatement findByIDStatement;
-	PreparedStatement insertItemStatement;
-	PreparedStatement deleteStatement;
-	PreparedStatement updateStatement;
-	PreparedStatement createTableStatement;
+	private Connection con;
+	private Statement findAllStatement;
+	private PreparedStatement findByIDStatement;
+	private PreparedStatement insertItemStatement;
+	private PreparedStatement deleteStatement;
+	private PreparedStatement updateStatement;
+	private PreparedStatement createTableStatement;
 	
 	public InvoiceMasterImpl(Connection con) {
 		// TODO Auto-generated constructor stub
 		this.con = con;
 		try {
-			createTableStatement = con.prepareStatement("create table from invoice_master(invoice_id INTEGER, date varchar(30), customer_id INTEGER)");
+			createTableStatement = con.prepareStatement("create table invoice_master(invoice_id INTEGER, date varchar(30), customer_id INTEGER)");
 			findAllStatement = con.createStatement();
 			findByIDStatement = con.prepareStatement("select * from invoice_master where invoice_id = ?");
 			insertItemStatement = con.prepareStatement("insert into invoice_master values(?, ?, ?)");
@@ -85,18 +85,21 @@ public class InvoiceMasterImpl implements InvoiceMasterDAO{
 	}
 
 	@Override
-	public int insertItem(InvoiceMasterDTO invoiceMasterDTO) {
+	public int insertInvoiceMasterItem(InvoiceMasterDTO invoiceMasterDTO) {
 		// TODO Auto-generated method stub
-		String date = invoiceMasterDTO.getDate();
 		int invoiceId = invoiceMasterDTO.getInvoiceId();
-		int customerId = invoiceMasterDTO.getCustomerId();
-
 		int i = 0;
 
 		try {
+			findByIDStatement.setInt(1, invoiceId);
+			ResultSet rs = findByIDStatement.executeQuery();
+			
+			if (rs.next())
+				return 0;
+			
 			insertItemStatement.setInt(1, invoiceId);
-			insertItemStatement.setString(2, date);
-			insertItemStatement.setInt(3, customerId);
+			insertItemStatement.setString(2, invoiceMasterDTO.getDate());
+			insertItemStatement.setInt(3, invoiceMasterDTO.getCustomerId());
 
 			i = insertItemStatement.executeUpdate();
 			;
@@ -110,20 +113,16 @@ public class InvoiceMasterImpl implements InvoiceMasterDAO{
 	}
 
 	@Override
-	public int updateItem(InvoiceMasterDTO invoiceMasterDTO) {
+	public int updateInvoiceMasterItem(InvoiceMasterDTO invoiceMasterDTO) {
 		// TODO Auto-generated method stub
-		String date = invoiceMasterDTO.getDate();
-		int invoiceId = invoiceMasterDTO.getInvoiceId();
-		int customerId = invoiceMasterDTO.getCustomerId();
-
 		int i = 0;
 
 		try {
-			updateStatement.setInt(3, invoiceId);
-			updateStatement.setString(1, date);
-			updateStatement.setInt(2, customerId);
+			updateStatement.setInt(3, invoiceMasterDTO.getInvoiceId());
+			updateStatement.setString(1, invoiceMasterDTO.getDate());
+			updateStatement.setInt(2, invoiceMasterDTO.getCustomerId());
 
-			i = insertItemStatement.executeUpdate();
+			i = updateStatement.executeUpdate();
 
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -135,7 +134,7 @@ public class InvoiceMasterImpl implements InvoiceMasterDAO{
 	}
 
 	@Override
-	public int deleteItemByID(Integer invoiceId) {
+	public int deleteInvoiceMasterItemByID(Integer invoiceId) {
 		// TODO Auto-generated method stub
 		int i = 0;
 
@@ -150,13 +149,12 @@ public class InvoiceMasterImpl implements InvoiceMasterDAO{
 	}
 
 	@Override
-	public int deleteItemByDTO(InvoiceMasterDTO invoiceMasterDTO) {
+	public int deleteInvoiceMasterItemByDTO(InvoiceMasterDTO invoiceMasterDTO) {
 		// TODO Auto-generated method stub
-		int invoiceId = invoiceMasterDTO.getInvoiceId();
 		int i = 0;
 
 		try {
-			deleteStatement.setInt(1, invoiceId);
+			deleteStatement.setInt(1, invoiceMasterDTO.getInvoiceId());
 			i = deleteStatement.executeUpdate();
 		} catch (Exception e) {
 			// TODO: handle exception

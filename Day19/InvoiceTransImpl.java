@@ -12,19 +12,19 @@ import day18.JDBCUtility;
 
 public class InvoiceTransImpl implements InvoiceTransDAO {
 
-	Connection con;
-	Statement findAllStatement;
-	PreparedStatement findByIDStatement;
-	PreparedStatement insertItemStatement;
-	PreparedStatement deleteStatement;
-	PreparedStatement updateStatement;
-	PreparedStatement createTable;
+	private Connection con;
+	private Statement findAllStatement;
+	private PreparedStatement findByIDStatement;
+	private PreparedStatement insertItemStatement;
+	private PreparedStatement deleteStatement;
+	private PreparedStatement updateStatement;
+	private PreparedStatement createTable;
 
 	public InvoiceTransImpl(Connection con) {
 		// TODO Auto-generated constructor stub
 		this.con = con;
 		try {
-			createTable = con.prepareStatement("create table invoice_trans(invoice_id INTEGER, item_id INTEGER, gty INTEGER)");
+			createTable = con.prepareStatement("create table invoice_trans(invoice_id INTEGER, item_id INTEGER, qty INTEGER)");
 			findAllStatement = con.createStatement();
 			findByIDStatement = con.prepareStatement("select * from invoice_trans where invoice_id = ?");
 			insertItemStatement = con.prepareStatement("insert into invoice_trans values(?, ?, ?)");
@@ -74,7 +74,6 @@ public class InvoiceTransImpl implements InvoiceTransDAO {
 				invoiceTransItem.setInvoiceId(rs.getInt(1));
 				invoiceTransItem.setQty(rs.getInt(3));
 				invoiceTransItem.setItemId(rs.getInt(2));
-				;
 
 				invoiceTransItems.add(invoiceTransItem);
 			}
@@ -91,15 +90,21 @@ public class InvoiceTransImpl implements InvoiceTransDAO {
 	public int insertTrans(InvoiceTransDTO invoiceTransDTO) {
 		// TODO Auto-generated method stub
 		int invoiceId = invoiceTransDTO.getInvoiceId();
-		int itemId = invoiceTransDTO.getItemId();
-		int qty = invoiceTransDTO.getQty();
 
 		int i = 0;
 
 		try {
+			findByIDStatement.setInt(1, invoiceId);
+			ResultSet rs = findByIDStatement.executeQuery();
+
+			if (rs.next()) {
+				System.out.println("Duplicate is there");
+				return 0;
+			}
+			System.out.println("No duplicates");
 			insertItemStatement.setInt(1, invoiceId);
-			insertItemStatement.setInt(2, itemId);
-			insertItemStatement.setInt(3, qty);
+			insertItemStatement.setInt(2, invoiceTransDTO.getItemId());
+			insertItemStatement.setInt(3, invoiceTransDTO.getQty());
 
 			i = insertItemStatement.executeUpdate();
 		} catch (Exception e) {
@@ -114,17 +119,14 @@ public class InvoiceTransImpl implements InvoiceTransDAO {
 	@Override
 	public int updateTrans(InvoiceTransDTO invoiceTransDTO) {
 		// TODO Auto-generated method stub
-		int invoiceId = invoiceTransDTO.getInvoiceId();
-		int itemId = invoiceTransDTO.getItemId();
-		int qty = invoiceTransDTO.getQty();
 		int i = 0;
 
 		try {
-			updateStatement.setInt(3, invoiceId);
-			updateStatement.setInt(1, itemId);
-			updateStatement.setInt(2, qty);
+			updateStatement.setInt(3, invoiceTransDTO.getInvoiceId());
+			updateStatement.setInt(1, invoiceTransDTO.getItemId());
+			updateStatement.setInt(2, invoiceTransDTO.getQty());
 
-			i = insertItemStatement.executeUpdate();
+			i = updateStatement.executeUpdate();
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
@@ -152,12 +154,11 @@ public class InvoiceTransImpl implements InvoiceTransDAO {
 	@Override
 	public int deleteTransByDTO(InvoiceTransDTO invoiceTransDTO) {
 		// TODO Auto-generated method stub
-		int invoiceId = invoiceTransDTO.getInvoiceId();
 
 		int i = 0;
 
 		try {
-			deleteStatement.setInt(1, invoiceId);
+			deleteStatement.setInt(1,  invoiceTransDTO.getInvoiceId());
 			i = deleteStatement.executeUpdate();
 		} catch (Exception e) {
 			// TODO: handle exception

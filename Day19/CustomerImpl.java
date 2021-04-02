@@ -13,13 +13,13 @@ import day18.JDBCUtility;
 
 public class CustomerImpl implements CustomerDAO {
 
-	Connection con;
-	Statement findAllStatement;
-	PreparedStatement findByIDStatement;
-	PreparedStatement insertItemStatement;
-	PreparedStatement deleteStatement;
-	PreparedStatement updateStatement;
-	PreparedStatement createTable;
+	private Connection con;
+	private Statement findAllStatement;
+	private PreparedStatement findByIDStatement;
+	private PreparedStatement insertItemStatement;
+	private PreparedStatement deleteStatement;
+	private PreparedStatement updateStatement;
+	private PreparedStatement createTable;
 
 	public CustomerImpl(Connection con) {
 		// TODO Auto-generated constructor stub
@@ -94,19 +94,20 @@ public class CustomerImpl implements CustomerDAO {
 	public int insertCustomer(CustomerDTO customerDTO) {
 		// TODO Auto-generated method stub
 		int customerId = customerDTO.getCustomerId();
-		String customerName = customerDTO.getCust_name();
-		String customerAddress = customerDTO.getCust_address();
-		int customerAccountDetails = customerDTO.getCust_account_details();
-		int customerGSTNumber = customerDTO.getCust_gstNum();
-
 		int i = 0;
 
 		try {
+			findByIDStatement.setInt(1, customerId);
+			ResultSet rs = findByIDStatement.executeQuery();
+
+			if (rs.next())
+				return 0;
+			
 			insertItemStatement.setInt(1, customerId);
-			insertItemStatement.setString(2, customerName);
-			insertItemStatement.setString(3, customerAddress);
-			insertItemStatement.setInt(4, customerAccountDetails);
-			insertItemStatement.setInt(5, customerGSTNumber);
+			insertItemStatement.setString(2, customerDTO.getCust_name());
+			insertItemStatement.setString(3, customerDTO.getCust_address());
+			insertItemStatement.setInt(4, customerDTO.getCust_account_details());
+			insertItemStatement.setInt(5, customerDTO.getCust_gstNum());
 
 			i = insertItemStatement.executeUpdate();
 		} catch (Exception e) {
@@ -121,22 +122,16 @@ public class CustomerImpl implements CustomerDAO {
 	@Override
 	public int updateCustomer(CustomerDTO customerDTO) {
 		// TODO Auto-generated method stub
-		int customerId = customerDTO.getCustomerId();
-		String customerName = customerDTO.getCust_name();
-		String customerAddress = customerDTO.getCust_address();
-		int customerAccountDetails = customerDTO.getCust_account_details();
-		int customerGSTNumber = customerDTO.getCust_gstNum();
-
 		int i = 0;
 
 		try {
-			updateStatement.setInt(5, customerId);
-			updateStatement.setString(1, customerName);
-			updateStatement.setString(2, customerAddress);
-			updateStatement.setInt(4, customerGSTNumber);
-			updateStatement.setInt(3, customerAccountDetails);
+			updateStatement.setInt(5, customerDTO.getCustomerId());
+			updateStatement.setString(1, customerDTO.getCust_name());
+			updateStatement.setString(2, customerDTO.getCust_address());
+			updateStatement.setInt(4, customerDTO.getCust_gstNum());
+			updateStatement.setInt(3, customerDTO.getCust_account_details());
 
-			i = insertItemStatement.executeUpdate();
+			i = updateStatement.executeUpdate();
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
@@ -154,6 +149,9 @@ public class CustomerImpl implements CustomerDAO {
 		try {
 			deleteStatement.setInt(1, customerId);
 			i = deleteStatement.executeUpdate();
+			System.out.println();
+			System.out.println(findAllCustomer());
+			System.out.println("\n\nDeleted ........" + i);
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
@@ -164,11 +162,10 @@ public class CustomerImpl implements CustomerDAO {
 	@Override
 	public int deleteCustomerByDTO(CustomerDTO customerDTO) {
 		// TODO Auto-generated method stub
-		int customerId = customerDTO.getCustomerId();
 		int i = 0;
 
 		try {
-			deleteStatement.setInt(1, customerId);
+			deleteStatement.setInt(1, customerDTO.getCustomerId());
 			i = deleteStatement.executeUpdate();
 		} catch (Exception e) {
 			// TODO: handle exception

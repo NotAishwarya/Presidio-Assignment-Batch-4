@@ -8,17 +8,19 @@ import day18.JDBCUtility;
 
 public class ItemMasterImpl implements ItemMasterDAO {
 
-	Connection con;
-	Statement findAllStatement;
-	PreparedStatement findByIDStatement;
-	PreparedStatement insertItemStatement;
-	PreparedStatement deleteStatement;
-	PreparedStatement updateStatement;
-	
+	private Connection con;
+	private Statement findAllStatement;
+	private PreparedStatement findByIDStatement;
+	private PreparedStatement insertItemStatement;
+	private PreparedStatement deleteStatement;
+	private PreparedStatement updateStatement;
+	private PreparedStatement createTable;
+
 	public ItemMasterImpl(Connection con) {
 		// TODO Auto-generated constructor stub
 		this.con = con;
 		try {
+			createTable = con.prepareStatement(" create table items(id INTEGER, name varchar(30), price FLOAT)");
 			findAllStatement = con.createStatement();
 			findByIDStatement = con.prepareStatement("select * from items where id = ?");
 			insertItemStatement = con.prepareStatement("insert into items values(?, ?, ?)");
@@ -82,42 +84,39 @@ public class ItemMasterImpl implements ItemMasterDAO {
 
 	@Override
 	public int insertItem(ItemDTO itemDTO) {
-		// TODO Auto-generated method stub
-		String item_name = itemDTO.getItem_name();
 		int itemid = itemDTO.getItemid();
-		float itemPrice = itemDTO.getUnit_price();
-
 		int i = 0;
 
 		try {
-			insertItemStatement.setInt(1, itemid);
-			insertItemStatement.setString(2, item_name);
-			insertItemStatement.setFloat(3, itemPrice);
+			findByIDStatement.setInt(1, itemid);
+			ResultSet rs = findByIDStatement.executeQuery();
 
-			i = insertItemStatement.executeUpdate();
-			;
+			if (rs.next())
+				return 0;
+
+			System.out.println("Executed Update");
+			insertItemStatement.setInt(1, itemid);
+			insertItemStatement.setString(2, itemDTO.getItem_name());
+			insertItemStatement.setFloat(3, itemDTO.getUnit_price());
+
+			return i = insertItemStatement.executeUpdate();
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
 			return 0;
 		}
 
-		return i;
 	}
- 
+
 	@Override
 	public int updateItem(ItemDTO itemDTO) {
 		// TODO Auto-generated method stub
-		String item_name = itemDTO.getItem_name();
-		int itemid = itemDTO.getItemid();
-		float itemPrice = itemDTO.getUnit_price();
-
 		int i = 0;
 
 		try {
-			updateStatement.setString(1, item_name);
-			updateStatement.setFloat(2, itemPrice);
-			updateStatement.setInt(3, itemid);
+			updateStatement.setString(1, itemDTO.getItem_name());
+			updateStatement.setFloat(2, itemDTO.getUnit_price());
+			updateStatement.setInt(3, itemDTO.getItemid());
 
 			i = updateStatement.executeUpdate();
 
@@ -146,11 +145,10 @@ public class ItemMasterImpl implements ItemMasterDAO {
 	@Override
 	public int deleteItemByDTO(ItemDTO itemDTO) {
 		// TODO Auto-generated method stub
-		int itemid = itemDTO.getItemid();
 		int i = 0;
 
 		try {
-			deleteStatement.setInt(1, itemid);
+			deleteStatement.setInt(1, itemDTO.getItemid());
 			i = deleteStatement.executeUpdate();
 		} catch (Exception e) {
 			// TODO: handle exception
